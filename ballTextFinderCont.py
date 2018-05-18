@@ -2,7 +2,6 @@
 
 import cv2
 import numpy as np
-from matplotlib import pyplot as plt
 
 
 class TextFinder:
@@ -13,24 +12,20 @@ class TextFinder:
         for i in cnt:
             canny[i[0,1],i[0,0]] = 0
 
-    def findColor(self,img,color):
-        arr = np.where(img == color)[0]
-        for i in range(len(arr)-3):
-            if(arr[i] == arr[i+2]):
-                return True
-        return False
 
     def FindText(self,img):
-        blackMargin =5
+        blackMargin = 5
         original = img.copy()
         img_h,img_w = img.shape[:2]
         frame = np.zeros((img_h+(2*blackMargin),img_w+(2*blackMargin),3), np.uint8)
+        mask = np.zeros((img_h+(2*blackMargin),img_w+(2*blackMargin),3), np.uint8)
+        colMask = np.zeros((img_h+(2*blackMargin),img_w+(2*blackMargin),3), np.uint8)
         frame[blackMargin:img_h+blackMargin,blackMargin:img_w+blackMargin] = img
 
         bin = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
-        ret, bin = cv2.threshold(bin,176,255,cv2.THRESH_BINARY)
+        ret, bin = cv2.threshold(bin,190,255,cv2.THRESH_BINARY)
         for i in bin:
-            if np.count_nonzero(i) > 2:
+            if np.count_nonzero(i) > 0:
                 i = [255,255,255]
             else:
                 i = [0,0,0]
@@ -39,6 +34,9 @@ class TextFinder:
         bin = cv2.morphologyEx(bin, cv2.MORPH_OPEN, kernel, iterations=1)
         kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(2,2))
         bin = cv2.erode(bin,kernel,iterations = 1)
+
+##        cv2.imshow("bin",bin)
+##        cv2.waitKey(0)
 
 
         blur = cv2.GaussianBlur(bin,(3,3),0)
@@ -76,22 +74,19 @@ class TextFinder:
 
 
         point = contour[0][0]
-        bgColor = frame[point[0,1]+1,point[0,0]+1]
+        bgColor = frame[point[0,1]+5,point[0,0]+5]
         bgColor = bgColor.tolist()
-        cv2.drawContours(frame, contour, -1, bgColor, -1)
+        cv2.drawContours(mask, contour, -1, (255,255,255), -1)
+        cv2.drawContours(mask, contour, -1, (0,0,0), 3)
+        cv2.drawContours(colMask, contour, -1, bgColor, -1)
+        cv2.drawContours(colMask, contour, -1, (0,0,0), 3)
 
+        mask = cv2.bitwise_not(mask)
+        frame = cv2.bitwise_and(frame,mask)
+        frame = cv2.bitwise_or(frame,colMask)
+
+        #frame = cv2.inpaint(frame,colMask,1,cv2.INPAINT_TELEA)
         return frame[blackMargin:img_h+blackMargin,blackMargin:img_w+blackMargin]
-
-##textFinder=TextFinder()
-##
-##for i in range(1,51):
-##    Image = 'ball' + str(i) +'.jpg'
-##    cnImage = 'canny' + str(i) +'.jpg'
-##    outputImage = 'found' + str(i) +'.jpg'
-##    img=cv2.imread(Image,cv2.IMREAD_COLOR)
-##    cny, findImg = textFinder.FindText(img)
-##    cv2.imwrite(cnImage,cny)
-##    cv2.imwrite(outputImage,findImg)
 
 
 
