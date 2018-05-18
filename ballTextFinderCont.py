@@ -73,16 +73,22 @@ class TextFinder:
                 break
 
 
-        point = contour[0][0]
-        bgColor = frame[point[0,1]+5,point[0,0]+5]
-        bgColor = bgColor.tolist()
         cv2.drawContours(mask, contour, -1, (255,255,255), -1)
         cv2.drawContours(mask, contour, -1, (0,0,0), 3)
-        cv2.drawContours(colMask, contour, -1, bgColor, -1)
-        cv2.drawContours(colMask, contour, -1, (0,0,0), 3)
+        hImg = cv2.bitwise_and(frame,mask)
+        gray = cv2.cvtColor(hImg,cv2.COLOR_BGR2GRAY)
+        hist = cv2.calcHist([gray],[0],None,[256],[1,256])
+        hist = hist.tolist()
+        colMax = max(hist)
+        bgColor = hist.index(colMax)
 
         mask = cv2.bitwise_not(mask)
         frame = cv2.bitwise_and(frame,mask)
+
+
+        cv2.drawContours(colMask, contour, -1, (bgColor,bgColor,bgColor), -1)
+        cv2.drawContours(colMask, contour, -1, (0,0,0), 3)
+
         frame = cv2.bitwise_or(frame,colMask)
 
         #frame = cv2.inpaint(frame,colMask,1,cv2.INPAINT_TELEA)
