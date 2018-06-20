@@ -39,7 +39,7 @@ def textDelete(event, x,y, flags, param):
     elif event == cv2.EVENT_LBUTTONUP:
         drawing = False
         img = origin.copy()
-        textFinder= ballTextMasker.TextFinder()
+        textFinder= ballTextMasker.BalloonCleaner()
         if ix < x:
             x1 = ix
             x2 = x
@@ -53,7 +53,7 @@ def textDelete(event, x,y, flags, param):
             y1 = y
             y2 = iy
         maskBack = mask.copy()
-        mask[y1:y2+1,x1:x2+1], img[y1:y2+1,x1:x2+1] = textFinder.FindText(img[y1:y2+1,x1:x2+1])
+        mask[y1:y2+1,x1:x2+1], img[y1:y2+1,x1:x2+1] = textFinder.cleanBalloon(img[y1:y2+1,x1:x2+1])
         back = origin.copy()
         origin = img.copy()
         #cv2.rectangle(img,(ix,iy),(x,y),(255,0,0),-1)
@@ -105,16 +105,12 @@ def main(string) :
         roiNum += 1
 
     fileName = string.split('.')[-2]
+    cleanName = fileName + "_clean.png"
     maskName = fileName + "_mask.png"
-    binName = fileName + "_binmask.png"
-    bin = np.zeros(Image.shape[:2],np.uint8)
-    for i in range(Image.shape[0]):
-        for j in range(Image.shape[1]):
-            if (Mask[i,j] != [0,0,0]).any():
-                bin[i,j] = 1
 
+    cv2.imwrite(cleanName,Image)
     cv2.imwrite(maskName,Mask)
-    cv2.imwrite(binName,bin)
+
 
 
 
