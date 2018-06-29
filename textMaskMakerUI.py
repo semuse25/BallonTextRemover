@@ -53,7 +53,8 @@ def textDelete(event, x,y, flags, param):
             y1 = y
             y2 = iy
         maskBack = mask.copy()
-        mask[y1:y2+1,x1:x2+1], img[y1:y2+1,x1:x2+1] = textFinder.cleanBalloon(img[y1:y2+1,x1:x2+1])
+        maskTemp, img[y1:y2+1,x1:x2+1] = textFinder.cleanBalloon(img[y1:y2+1,x1:x2+1])
+        mask[y1:y2 + 1, x1:x2 + 1] = cv2.add(mask[y1:y2+1,x1:x2+1],maskTemp)
         back = origin.copy()
         origin = img.copy()
         #cv2.rectangle(img,(ix,iy),(x,y),(255,0,0),-1)
