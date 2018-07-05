@@ -60,13 +60,9 @@ def textDelete(event, x,y, flags, param):
         #cv2.rectangle(img,(ix,iy),(x,y),(255,0,0),-1)
         #print(x-ix,y-iy)
 
-
-
-
-
-def main(string) :
+def main(srcpath,dstpath) :
     global img, origin, back, mask, maskBack
-    Image=cv2.imread(string,cv2.IMREAD_COLOR)
+    Image=cv2.imread(srcpath,cv2.IMREAD_COLOR)
     Mask = np.zeros(Image.shape,np.uint8)
     roiNum = 1
     while True:
@@ -105,14 +101,11 @@ def main(string) :
 
         roiNum += 1
 
-    fileName = string.split('.')[-2]
-    cleanName = fileName + "_clean.png"
-    maskName = fileName + "_mask.png"
+    cleanName = dstpath + "_clean.png"
+    maskName = dstpath + "_mask.png"
 
     cv2.imwrite(cleanName,Image)
     cv2.imwrite(maskName,Mask)
-
-
 
 
 if __name__ == "__main__" :
