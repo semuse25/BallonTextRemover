@@ -28,9 +28,10 @@ mask = []
 maskBack = []
 maskTemp = []
 rad = 10
+color = (255,255,255)
 
 def textDelete(event, x,y, flags, param):
-    global ix, iy, drawing, img, origin, back, mask, maskBack, maskTemp, mode, rad
+    global ix, iy, drawing, img, origin, back, mask, maskBack, maskTemp, mode, rad, color
 
     trace = []
 
@@ -41,7 +42,7 @@ def textDelete(event, x,y, flags, param):
             iy = y
         elif mode == 'DRAW':
             maskTemp = np.zeros(mask.shape,np.uint8)
-            cv2.circle(img,(x,y),rad,(255,255,255),-1)
+            cv2.circle(img,(x,y),rad,color,-1)
             cv2.circle(maskTemp,(x,y),rad,(0,0,255),-1)
         drawing = True
     elif event == cv2.EVENT_MOUSEMOVE:
@@ -51,7 +52,7 @@ def textDelete(event, x,y, flags, param):
                 cv2.rectangle(img,(ix,iy),(x,y),(255,0,0),1)
         elif mode == 'DRAW':
             if drawing == True:
-                cv2.circle(img,(x,y),rad,(255,255,255),-1)
+                cv2.circle(img,(x,y),rad,color,-1)
                 cv2.circle(maskTemp,(x,y),rad,(0,0,255),-1)
     elif event == cv2.EVENT_LBUTTONUP:
         drawing = False
@@ -77,12 +78,19 @@ def textDelete(event, x,y, flags, param):
             back = origin.copy()
             origin = img.copy()
         elif mode == 'DRAW':
-            imgInv = cv2.bitwise_not(origin)
+            if color[0] > 128:
+                imgTemp = cv2.bitwise_not(origin)
+            else:
+                imgTemp = origin.copy()
             maskBack = mask.copy()
             back = origin.copy()
             origin = img.copy()
-            maskTemp = cv2.bitwise_and(imgInv,maskTemp)
+            maskTemp = cv2.bitwise_and(imgTemp,maskTemp)
             mask = cv2.add(mask,maskTemp)
+    elif event == cv2.EVENT_RBUTTONDOWN:
+        if mode == 'DRAW':
+            color = (img[y,x]).tolist()
+            print('mode DRAW  rad = '+str(rad)+" color is ",color)
 
 
 
@@ -90,11 +98,13 @@ def textDelete(event, x,y, flags, param):
 
 
 def main(srcpath,dstpath) :
-    global img, origin, back, mask, maskBack, drawing, mode, rad
+    global img, origin, back, mask, maskBack, drawing, mode, rad , color
     Image=cv2.imread(srcpath,cv2.IMREAD_COLOR)
     Mask = np.zeros(Image.shape,np.uint8)
     roiNum = 1
     reset = False
+    color = (255,255,255)
+    mode = 'RECT'
     print('mode RECT')
     while True:
         if Image.shape[0] <= mainShowArea*(roiNum-1):
@@ -141,18 +151,20 @@ def main(srcpath,dstpath) :
             elif k == 109 and drawing == False:
                 if mode == 'RECT':
                     mode = 'DRAW'
-                    print('mode DRAW  rad = '+str(rad))
+                    print('mode DRAW  rad = '+str(rad)+" color is ",color )
                 elif mode == 'DRAW':
                     mode = 'RECT'
                     print('mode RECT')
             elif k == 43 and drawing == False and mode == 'DRAW':
                 if rad < 30:
                     rad += 1
-                    print('mode DRAW  rad = '+str(rad))
+                    print('mode DRAW  rad = '+str(rad)+" color is ",color)
             elif k == 45 and drawing == False and mode == 'DRAW':
                 if rad > 1:
                     rad -= 1
-                    print('mode DRAW  rad = '+str(rad))
+                    print('mode DRAW  rad = '+str(rad)+" color is ",color)
+
+
 
 
         if reset == True:
