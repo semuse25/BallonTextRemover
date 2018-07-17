@@ -141,7 +141,7 @@ def main(srcpath,dstpath) :
             elif k == 113:
                 rad = 10
                 mode = 'RECT'
-                return -1
+                return 'q'
             elif k == 114:
                 cv2.destroyAllWindows()
                 reset = True
@@ -169,7 +169,7 @@ def main(srcpath,dstpath) :
 
         if reset == True:
             main(srcpath,dstpath)
-            return -1
+            return 'reset'
         roiNum += 1
 
     cleanName = dstpath + "_clean.png"
