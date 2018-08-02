@@ -5,6 +5,7 @@ import numpy as np
 import imutils
 import cv2
 import imagetool
+import retrain_run_opencv
 
 kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(2,3))
 
@@ -123,12 +124,12 @@ def bubbleChecker(ori,img,i,x,y,w,h):
         print('%d is deleted by histogram STD %d'%(i,std))
         return 0
 
-    '''
+
     forCNN = imagetool.imgResizer(ori_trim)
-    if test(forCNN) is False:
+    if retrain_run_opencv.run_inference_on_image(forCNN) == 'bad':
         print('%d is deleted by CNN'%i)
         return 0
-    '''
+
 
     print('---------%d is selected! v:%d h:%d d:%d blob:%d STD:%d CC:%d----------' %(i,vcount,hcount,dcount,bcount,std,ccount))
 
@@ -138,7 +139,7 @@ def bubbleChecker(ori,img,i,x,y,w,h):
 
 def bubbleFinder(image):
     # load the image, convert it to grayscale, and blur it
-
+    retrain_run_opencv.create_graph()
     image2 = image
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     thresh = cv2.threshold(gray, 224, 250, cv2.THRESH_BINARY)[1]
