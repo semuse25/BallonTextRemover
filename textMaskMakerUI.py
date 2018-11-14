@@ -49,7 +49,7 @@ def textDelete(event, x,y, flags, param):
         if mode == 'RECT':
             if drawing == True:
                 img = origin.copy()
-                cv2.rectangle(img,(ix,iy),(x,y),(255,0,0),1)
+                cv2.rectangle(img,(ix,iy),(x,y),(255,0,0),4)
         elif mode == 'DRAW':
             if drawing == True:
                 cv2.circle(img,(x,y),rad,color,-1)
@@ -182,4 +182,4 @@ def main(srcpath,dstpath) :
 
 
 if __name__ == "__main__" :
-    main(sys.argv[1])
+    main(sys.argv[1], sys.argv[2])

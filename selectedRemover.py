@@ -28,19 +28,16 @@ def main(string):
     for root, dirs, files in os.walk(string):
         for fname in files:
             fileName = os.path.join(root, fname)
-            sp = fileName.split('/')[-1]
-            sp = sp.replace('\\','_')
-
-            cleanName = 'cleaned\\cleaned_'+sp
+            cleanName = 'cleaned\\cleaned_'+fileName.split('\\')[-1]
             #resName = 'cleaned\\res_' + fileName.split('\\')[-1]
-            maskName = 'cleaned\\mask_' +sp
+            maskName = 'cleaned\\mask_' +fileName.split('\\')[-1]
             img = cv2.imread(fileName)
             mask = np.zeros(img.shape,np.uint8)
             if img is None:
                 continue
-            if scanned.isScanned(img) is True:
-                print(fileName,' is scanned')
-                continue
+##            if scanned.isScanned(img) is True:
+##                print(fileName,' is scanned')
+##                continue
             data = bubbleFinder.bubbleFinder(img)
             if len(data) is not 0:
                 for [x, y, w, h] in data:
@@ -75,6 +72,7 @@ def main(string):
 
             #cv2.imwrite(resName,img)
             cv2.imwrite(maskName, mask)
+            os.remove(fileName)
 
 if __name__ == '__main__':
     main(sys.argv[1])
